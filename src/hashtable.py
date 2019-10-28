@@ -14,7 +14,7 @@ class HashTable:
     '''
     def __init__(self, capacity):
         self.capacity = capacity  # Number of buckets in the hash table
-        self.storage = [None] * capacity
+        self.storage = [None] * self.capacity
 
 
     def _hash(self, key):
@@ -51,7 +51,18 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        slot = self._hash_mod(key)
+        data = self.storage[slot]
+
+        if data is None:
+            self.storage[slot] = LinkedPair(key, value)
+        else:
+            while data and data.key != key:
+                previous, data = data, data.next
+            if data:
+                data.value = value
+            else:
+                previous.next = LinkedPair(key, value)
 
 
 
@@ -63,7 +74,19 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        slot = self._hash_mod(key)
+        data = self.storage[slot]
+        if not self.storage[slot]:
+            raise KeyError
+        else:
+            if data.key == key:
+                self.storage[slot] = None
+            else:
+                while data and data.key != key:
+                    previous, data = data, data.next
+                if data.value:
+                    previous.next = data.next
+
 
 
     def retrieve(self, key):
@@ -74,8 +97,17 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
-
+        slot = self._hash_mod(key)
+        data = self.storage[slot]
+        if not self.storage[slot]:
+            return None
+        else:
+            while data and data.key != key:
+                previous, data = data, data.next
+            if data:
+                return data.value
+            else:
+                return None
 
     def resize(self):
         '''
@@ -84,7 +116,18 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        new_storage = [None] * (self.capacity * 2)
+        old_data = self.storage
+        self.storage = new_storage
+        self.capacity = self.capacity * 2
+        
+        for i in old_data:
+            current = i
+            while current:
+                self.insert(current.key, current.value)
+                current = current.next
+
+
 
 
 
@@ -94,7 +137,6 @@ if __name__ == "__main__":
     ht.insert("line_1", "Tiny hash table")
     ht.insert("line_2", "Filled beyond capacity")
     ht.insert("line_3", "Linked list saves the day!")
-
     print("")
 
     # Test storing beyond capacity
