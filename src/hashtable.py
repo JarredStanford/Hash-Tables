@@ -117,26 +117,15 @@ class HashTable:
         Fill this in.
         '''
         new_storage = [None] * (self.capacity * 2)
-        
-        for i in range(self.capacity):
-            old_data = self.storage[i]
-            if old_data != None:
-                while old_data.next != None:
-                    slot = self._hash(old_data.key) % (self.capacity * 2)
-                    data = new_storage[slot]
-
-                    if data is None:
-                        new_storage[slot] = LinkedPair(old_data.key, old_data.value)
-                    else:
-                        while data and data.key != old_data.key:
-                            previous, data = data, data.next
-                        if data:
-                            data.value = old_data.value
-                        else:
-                            previous.next = LinkedPair(old_data.key, old_data.value)
-                        print(new_storage)
+        old_data = self.storage
         self.storage = new_storage
-        self.capacity = self.capacity *2
+        self.capacity = self.capacity * 2
+        
+        for i in old_data:
+            current = i
+            while current:
+                self.insert(current.key, current.value)
+                current = current.next
 
 
 
